@@ -18,7 +18,6 @@ type Handler struct{}
 func (s *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
 	// Implement handling of different LSP requests here
 	log.Println("Received request:", req.Method)
-	//log.Println("Received params:", req.Params)
 
 	switch req.Method {
 	case "initialize":
