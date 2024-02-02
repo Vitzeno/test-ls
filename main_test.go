@@ -10,6 +10,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+/*
+	if res != nil {
+		var result jsonrpc2.Response
+		if err := json.Unmarshal(res, &result); err != nil {
+			log.Println(err)
+			return
+		}
+
+		if err := conn.Reply(ctx, req.ID, result); err != nil {
+			log.Println(err)
+			return
+		}
+	}
+*/
 func TestJSONRPC(t *testing.T) {
 	for _, tc := range []struct {
 		name string
@@ -19,7 +33,8 @@ func TestJSONRPC(t *testing.T) {
 		{
 			name: "initialize",
 			req:  `initialize`,
-			res:  []byte(`{"id":123,"result":{"foo":"bar"},"jsonrpc":"2.0"}`),
+			// TODO: ID should not be hardcoded
+			res: []byte(`{"id":0,"result":{"foo":"bar"},"jsonrpc":"2.0"}`),
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -38,14 +53,14 @@ func TestJSONRPC(t *testing.T) {
 			client := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(clientConn), nil)
 			defer client.Close()
 
-			var acReq jsonrpc2.Request
-			require.NoError(t, acReq.UnmarshalJSON([]byte(`{"id":123,"method":"`+tc.req+`","jsonrpc":"2.0"}`)))
+			var actualRequest jsonrpc2.Request
+			require.NoError(t, actualRequest.UnmarshalJSON([]byte(`{"id":0,"method":"`+tc.req+`","jsonrpc":"2.0"}`)))
 
-			var actualRes jsonrpc2.Response
-			err := client.Call(ctx, acReq.Method, nil, &actualRes)
+			var actualResponse jsonrpc2.Response
+			err := client.Call(ctx, actualRequest.Method, nil, &actualResponse)
 			require.NoError(t, err)
 
-			require.Equal(t, expectedRes, actualRes)
+			require.Equal(t, expectedRes, actualResponse)
 		})
 	}
 }

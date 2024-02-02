@@ -9,8 +9,8 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-type NotificationHandler func(params *json.RawMessage) error
-type MethodHandler func(params *json.RawMessage) (*jsonrpc2.Response, error)
+type NotificationHandler func(params json.RawMessage) error
+type MethodHandler func(params json.RawMessage) (json.RawMessage, error)
 
 type Handler struct {
 	NotificationHandlers map[string]NotificationHandler
@@ -40,7 +40,11 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 	}
 
 	if res != nil {
-		if err := conn.Reply(ctx, req.ID, *res); err != nil {
+		var result jsonrpc2.Response
+		result.ID = req.ID
+		result.Result = &res
+
+		if err := conn.Reply(ctx, req.ID, result); err != nil {
 			log.Println("Error replying to request:", err)
 		}
 	}
@@ -66,17 +70,22 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 	// }
 }
 
-func (h *Handler) process(req *jsonrpc2.Request) (*jsonrpc2.Response, error) {
+func (h *Handler) process(req *jsonrpc2.Request) (json.RawMessage, error) {
+	var params json.RawMessage
+	if req.Params == nil {
+		params = []byte(``)
+	}
+
 	if req.Notif {
 		if nh, ok := h.NotificationHandlers[req.Method]; ok {
-			return nil, nh(req.Params)
+			return nil, nh(params)
 		}
 		// TODO: use error code from lsp spec, or is the jsonrpc2.CodeMethodNotFound wrapper enough?
 		return nil, fmt.Errorf("no notification handler for method %q", req.Method)
 	}
 
 	if mh, ok := h.MethodHandlers[req.Method]; ok {
-		return mh(req.Params)
+		return mh(params)
 	}
 
 	// TODO: use error code from lsp spec, or is the jsonrpc2.CodeMethodNotFound wrapper enough?
