@@ -28,7 +28,8 @@ func NewHandler() *Handler {
 
 func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
 	// Implement handling of different LSP requests here
-	log.Println("Received request:", req.Method)
+	// log.Println("Received request:", req.Method)
+	// log.Println("Received params:", req.Params)
 
 	res, err := h.process(req)
 	if err != nil {
@@ -48,32 +49,12 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 			log.Println("Error replying to request:", err)
 		}
 	}
-
-	// switch req.Method {
-	// case "initialize":
-	// 	var result jsonrpc2.Response
-	// 	if err := json.Unmarshal([]byte(`{"id":123,"result":{"foo":"bar"},"jsonrpc":"2.0"}`), &result); err != nil {
-	// 		log.Println(err)
-	// 		return
-	// 	}
-
-	// 	if err := conn.Reply(ctx, req.ID, result); err != nil {
-	// 		log.Println(err)
-	// 		return
-	// 	}
-	// default:
-	// 	err := &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: "Method not found"}
-	// 	if err := conn.ReplyWithError(ctx, req.ID, err); err != nil {
-	// 		log.Println(err)
-	// 		return
-	// 	}
-	// }
 }
 
 func (h *Handler) process(req *jsonrpc2.Request) (json.RawMessage, error) {
-	var params json.RawMessage
-	if req.Params == nil {
-		params = []byte(``)
+	params := []byte(``)
+	if req.Params != nil {
+		params = *req.Params
 	}
 
 	if req.Notif {

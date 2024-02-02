@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"log"
 )
 
 type InitializeParams struct {
@@ -25,6 +26,7 @@ type ClientCapabilities struct {
 }
 
 func Initialize(params json.RawMessage) (json.RawMessage, error) {
+	log.Println("Received request initialize with params:", params)
 	// var p InitializeParams
 	// err := json.Unmarshal(*params, &p)
 	// if err != nil {

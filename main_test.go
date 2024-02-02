@@ -10,20 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-/*
-	if res != nil {
-		var result jsonrpc2.Response
-		if err := json.Unmarshal(res, &result); err != nil {
-			log.Println(err)
-			return
-		}
-
-		if err := conn.Reply(ctx, req.ID, result); err != nil {
-			log.Println(err)
-			return
-		}
-	}
-*/
 func TestJSONRPC(t *testing.T) {
 	for _, tc := range []struct {
 		name string
