@@ -2,43 +2,12 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net"
 
+	"github.com/Vitzeno/test-ls/internal"
 	"github.com/sourcegraph/jsonrpc2"
 )
-
-type Result struct {
-	Label string `json:"label"`
-}
-
-type Handler struct{}
-
-func (s *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
-	// Implement handling of different LSP requests here
-	log.Println("Received request:", req.Method)
-
-	switch req.Method {
-	case "initialize":
-		var result jsonrpc2.Response
-		if err := json.Unmarshal([]byte(`{"id":123,"result":{"foo":"bar"},"jsonrpc":"2.0"}`), &result); err != nil {
-			log.Println(err)
-			return
-		}
-
-		if err := conn.Reply(ctx, req.ID, result); err != nil {
-			log.Println(err)
-			return
-		}
-	default:
-		err := &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: "Method not found"}
-		if err := conn.ReplyWithError(ctx, req.ID, err); err != nil {
-			log.Println(err)
-			return
-		}
-	}
-}
 
 func main() {
 	ctx := context.Background()
@@ -90,24 +59,13 @@ func main() {
 			note the headers before the json-rpc request body
 		*/
 
+		handler := internal.NewHandler()
 		go jsonrpc2.NewConn(
 			ctx,
 			jsonrpc2.NewBufferedStream(conn, jsonrpc2.VSCodeObjectCodec{}),
-			&Handler{},
+			handler,
 		)
 
 		//go handleConnection(ctx, conn)
 	}
 }
-
-// func handleConnection(ctx context.Context, conn net.Conn) {
-// 	rpcConn := jsonrpc2.NewConn(
-// 		ctx,
-// 		jsonrpc2.NewBufferedStream(conn, jsonrpc2.VSCodeObjectCodec{}),
-// 		&Handler{},
-// 	)
-
-// 	log.Println("rpc connection established")
-
-// 	defer rpcConn.Close()
-// }

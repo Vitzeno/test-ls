@@ -5,6 +5,7 @@ import (
 	"net"
 	"testing"
 
+	"github.com/Vitzeno/test-ls/internal"
 	"github.com/sourcegraph/jsonrpc2"
 	"github.com/stretchr/testify/require"
 )
@@ -22,21 +23,26 @@ func TestJSONRPC(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			serverConn, clientConn := net.Pipe()
+
+			handler := internal.NewHandler()
+
 			// Unmarshal the expectedRes byte slice into a jsonrpc2.Response
 			var expectedRes jsonrpc2.Response
 			require.NoError(t, expectedRes.UnmarshalJSON(tc.res))
 
-			ctx := context.Background()
-			serverConn, clientConn := net.Pipe()
-
-			server := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(serverConn), &Handler{})
+			server := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(serverConn), handler)
 			defer server.Close()
 
 			client := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(clientConn), nil)
 			defer client.Close()
 
+			var acReq jsonrpc2.Request
+			require.NoError(t, acReq.UnmarshalJSON([]byte(`{"id":123,"method":"`+tc.req+`","jsonrpc":"2.0"}`)))
+
 			var actualRes jsonrpc2.Response
-			err := client.Call(ctx, tc.req, nil, &actualRes)
+			err := client.Call(ctx, acReq.Method, nil, &actualRes)
 			require.NoError(t, err)
 
 			require.Equal(t, expectedRes, actualRes)
