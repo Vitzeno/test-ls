@@ -2,31 +2,30 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"net"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sourcegraph/jsonrpc2"
 	"github.com/stretchr/testify/require"
 )
 
 func TestJSONRPC(t *testing.T) {
 	for _, tc := range []struct {
-		name     string
-		request  string
-		response jsonrpc2.Response
+		name string
+		req  string
+		res  []byte
 	}{
 		{
-			name:    "initialize",
-			request: `initialize`,
-			response: jsonrpc2.Response{
-				ID:     jsonrpc2.ID{Num: 123},
-				Result: &json.RawMessage{},
-			},
+			name: "initialize",
+			req:  `initialize`,
+			res:  []byte(`{"id":123,"result":{"foo":"bar"},"jsonrpc":"2.0"}`),
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			// Unmarshal the expectedRes byte slice into a jsonrpc2.Response
+			var expectedRes jsonrpc2.Response
+			require.NoError(t, expectedRes.UnmarshalJSON(tc.res))
+
 			ctx := context.Background()
 			serverConn, clientConn := net.Pipe()
 
@@ -36,12 +35,11 @@ func TestJSONRPC(t *testing.T) {
 			client := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(clientConn), nil)
 			defer client.Close()
 
-			var result jsonrpc2.Response
-			err := client.Call(ctx, tc.request, nil, &result)
+			var actualRes jsonrpc2.Response
+			err := client.Call(ctx, tc.req, nil, &actualRes)
 			require.NoError(t, err)
 
-			require.Equal(t, tc.response, result)
-			spew.Dump(result)
+			require.Equal(t, expectedRes, actualRes)
 		})
 	}
 }
