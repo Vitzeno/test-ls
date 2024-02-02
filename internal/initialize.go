@@ -5,20 +5,23 @@ import (
 )
 
 type InitializeParams struct {
-	ProcessId             int         `json:"processId"`
-	ClientInfo            ClientInfo  `json:"clientInfo"`
-	Locale                string      `json:"locale"`
-	RootPath              string      `json:"rootPath"`
-	RootUri               string      `json:"rootUri"`
-	InitializationOptions interface{} `json:"initializationOptions"`
-	Capabilities          interface{} `json:"capabilities"`
-	Trace                 string      `json:"trace"`
-	WorkspaceFolders      []string    `json:"workspaceFolders"`
+	ProcessId             int                `json:"processId"`
+	ClientInfo            ClientInfo         `json:"clientInfo"`
+	Locale                string             `json:"locale"`
+	RootPath              string             `json:"rootPath"`
+	RootUri               string             `json:"rootUri"`
+	InitializationOptions interface{}        `json:"initializationOptions"`
+	Capabilities          ClientCapabilities `json:"capabilities"`
+	Trace                 string             `json:"trace"`
+	WorkspaceFolders      []string           `json:"workspaceFolders"`
 }
 
 type ClientInfo struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
+}
+
+type ClientCapabilities struct {
 }
 
 func Initialize(params json.RawMessage) (json.RawMessage, error) {
