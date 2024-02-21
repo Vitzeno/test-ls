@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"net"
 	"testing"
 
-	"github.com/Vitzeno/test-ls/internal"
 	"github.com/sourcegraph/jsonrpc2"
 	"github.com/stretchr/testify/require"
 )
@@ -29,7 +28,7 @@ func TestJSONRPC(t *testing.T) {
 			ctx := context.Background()
 			serverConn, clientConn := net.Pipe()
 
-			handler := internal.NewHandler()
+			handler := NewHandler()
 
 			// Unmarshal the expectedRes byte slice into a jsonrpc2.Response
 			var expectedRes jsonrpc2.Response
