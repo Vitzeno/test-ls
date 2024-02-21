@@ -57,16 +57,17 @@ func (h *Handler) process(req *jsonrpc2.Request) (json.RawMessage, error) {
 		params = *req.Params
 	}
 
+	// helper func that check if req has ID, if not determined as notification
 	if req.Notif {
-		if nh, ok := h.NotificationHandlers[req.Method]; ok {
-			return nil, nh(params)
+		if notifHandler, ok := h.NotificationHandlers[req.Method]; ok {
+			return nil, notifHandler(params)
 		}
 		// TODO: use error code from lsp spec, or is the jsonrpc2.CodeMethodNotFound wrapper enough?
 		return nil, fmt.Errorf("no notification handler for method %q", req.Method)
 	}
 
-	if mh, ok := h.MethodHandlers[req.Method]; ok {
-		return mh(params)
+	if methodHandler, ok := h.MethodHandlers[req.Method]; ok {
+		return methodHandler(params)
 	}
 
 	// TODO: use error code from lsp spec, or is the jsonrpc2.CodeMethodNotFound wrapper enough?
