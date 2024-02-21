@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"testing"
 
@@ -13,14 +14,15 @@ import (
 func TestJSONRPC(t *testing.T) {
 	for _, tc := range []struct {
 		name string
+		id   int
 		req  string
-		res  []byte
+		res  string
 	}{
 		{
 			name: "initialize",
+			id:   0,
 			req:  `initialize`,
-			// TODO: ID should not be hardcoded
-			res: []byte(`{"id":0,"result":{"foo":"bar"},"jsonrpc":"2.0"}`),
+			res:  `{"id":%d,"result":{"foo":"bar"},"jsonrpc":"2.0"}`,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -31,7 +33,7 @@ func TestJSONRPC(t *testing.T) {
 
 			// Unmarshal the expectedRes byte slice into a jsonrpc2.Response
 			var expectedRes jsonrpc2.Response
-			require.NoError(t, expectedRes.UnmarshalJSON(tc.res))
+			require.NoError(t, expectedRes.UnmarshalJSON([]byte(fmt.Sprintf(tc.res, tc.id))))
 
 			server := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(serverConn), handler)
 			defer server.Close()
@@ -39,11 +41,11 @@ func TestJSONRPC(t *testing.T) {
 			client := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(clientConn), nil)
 			defer client.Close()
 
-			var actualRequest jsonrpc2.Request
-			require.NoError(t, actualRequest.UnmarshalJSON([]byte(`{"id":0,"method":"`+tc.req+`","jsonrpc":"2.0"}`)))
+			var marshalledRequest jsonrpc2.Request
+			require.NoError(t, marshalledRequest.UnmarshalJSON([]byte(fmt.Sprintf(`{"id":%d,"method":"%s","jsonrpc":"2.0"}`, tc.id, tc.req))))
 
 			var actualResponse jsonrpc2.Response
-			err := client.Call(ctx, actualRequest.Method, nil, &actualResponse)
+			err := client.Call(ctx, marshalledRequest.Method, nil, &actualResponse)
 			require.NoError(t, err)
 
 			require.Equal(t, expectedRes, actualResponse)
