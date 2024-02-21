@@ -28,10 +28,11 @@ func NewHandler() *Handler {
 
 func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
 	// Implement handling of different LSP requests here
-	// log.Println("Received request:", req.Method)
-	// log.Println("Received params:", req.Params)
+	log.Println("Received request:", req.Method)
+	log.Println("Received ID:", req.ID)
+	log.Println("Received params:", req.Params)
 
-	res, err := h.process(req)
+	resp, err := h.process(req)
 	if err != nil {
 		err := &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: "Method not found"}
 		if err := conn.ReplyWithError(ctx, req.ID, err); err != nil {
@@ -40,14 +41,11 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 		}
 	}
 
-	if res != nil {
-		var result jsonrpc2.Response
-		result.ID = req.ID
-		result.Result = &res
-
-		if err := conn.Reply(ctx, req.ID, result); err != nil {
-			log.Println("Error replying to request:", err)
+	if resp != nil {
+		if err := conn.Reply(ctx, req.ID, resp); err != nil {
+			log.Println("Error responding to request:", err)
 		}
+		return
 	}
 }
 

@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"testing"
 
@@ -10,18 +9,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestJSONRPC(t *testing.T) {
+func TestHandler(t *testing.T) {
 	for _, tc := range []struct {
-		name string
-		id   int
-		req  string
-		res  string
+		name      string
+		reqMethod string
+		resp      string
+		params    string
 	}{
 		{
-			name: "initialize",
-			id:   0,
-			req:  `initialize`,
-			res:  `{"id":%d,"result":{"foo":"bar"},"jsonrpc":"2.0"}`,
+			name:      "initialize",
+			reqMethod: `initialize`,
+			resp:      `{"foo":"bar"}`,
+			params:    `{"hello":"world"}`,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -30,23 +29,18 @@ func TestJSONRPC(t *testing.T) {
 
 			handler := NewHandler()
 
-			// Unmarshal the expectedRes byte slice into a jsonrpc2.Response
-			var expectedRes jsonrpc2.Response
-			require.NoError(t, expectedRes.UnmarshalJSON([]byte(fmt.Sprintf(tc.res, tc.id))))
-
 			server := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(serverConn), handler)
 			defer server.Close()
 
 			client := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(clientConn), nil)
 			defer client.Close()
 
-			var marshalledRequest jsonrpc2.Request
-			require.NoError(t, marshalledRequest.UnmarshalJSON([]byte(fmt.Sprintf(`{"id":%d,"method":"%s","jsonrpc":"2.0"}`, tc.id, tc.req))))
-
 			var actualResponse jsonrpc2.Response
-			err := client.Call(ctx, marshalledRequest.Method, nil, &actualResponse)
+			err := client.Call(ctx, tc.reqMethod, tc.params, &actualResponse)
 			require.NoError(t, err)
 
+			var expectedRes jsonrpc2.Response
+			require.NoError(t, expectedRes.UnmarshalJSON([]byte(tc.resp)))
 			require.Equal(t, expectedRes, actualResponse)
 		})
 	}

@@ -8,11 +8,11 @@ import (
 type InitializeParams struct {
 	ProcessId             int                `json:"processId"`
 	ClientInfo            ClientInfo         `json:"clientInfo"`
+	Capabilities          ClientCapabilities `json:"capabilities"`
 	Locale                string             `json:"locale"`
 	RootPath              string             `json:"rootPath"`
 	RootUri               string             `json:"rootUri"`
 	InitializationOptions interface{}        `json:"initializationOptions"`
-	Capabilities          ClientCapabilities `json:"capabilities"`
 	Trace                 string             `json:"trace"`
 	WorkspaceFolders      []string           `json:"workspaceFolders"`
 }
@@ -22,6 +22,7 @@ type ClientInfo struct {
 	Version string `json:"version"`
 }
 
+// Don't care for now, figure this our later
 type ClientCapabilities struct {
 }
 
