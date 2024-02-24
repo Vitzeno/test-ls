@@ -5,5 +5,5 @@ run:
 .PHONY: run
 
 test:
-	@'go test -v -race $(TESTABLE)'
+	@go test -v -race $(TESTABLE)
 .PHONY: test
