@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -9,12 +10,11 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-func main() {
-	ctx := context.Background()
+func tcpHandler(ctx context.Context, handler *internal.Handler) error {
 	// Create a new TCP listener on localhost:8080
 	listener, err := net.Listen("tcp", "localhost:8080")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return fmt.Errorf("failed to listen: %w", err)
 	}
 	defer listener.Close()
 
@@ -30,8 +30,6 @@ func main() {
 		}
 		log.Println("Accepted connection")
 
-		handler := internal.NewHandler()
-
 		// Start a new goroutine to handle multiple connections concurrently
 		go func(conn net.Conn) {
 			<-jsonrpc2.NewConn(
@@ -44,4 +42,31 @@ func main() {
 			// possible that curl cannot handle the \n\n after content-length header causing it to hang
 		}(conn)
 	}
+}
+
+func stdHandler(ctx context.Context, handler *internal.Handler) error {
+	log.Println("Waiting for connection")
+
+	<-jsonrpc2.NewConn(
+		ctx,
+		jsonrpc2.NewBufferedStream(internal.Stdrwc{}, jsonrpc2.VSCodeObjectCodec{}),
+		//jsonrpc2.AsyncHandler(handler),
+		handler,
+	).DisconnectNotify()
+
+	log.Println("Connection closed")
+	return nil
+}
+
+func main() {
+	ctx := context.Background()
+
+	handler := internal.NewHandler()
+	err := stdHandler(ctx, handler)
+	if err != nil {
+		log.Fatalf("failed to handle tcp connection: %v", err)
+	}
+
+	// bytes, _ := io.ReadAll(internal.StdioCloser{})
+	// fmt.Print(string(bytes))
 }
