@@ -14,13 +14,19 @@ func TestHandler(t *testing.T) {
 		name      string
 		reqMethod string
 		resp      string
-		params    string
+		params    InitializeParams
 	}{
 		{
 			name:      "initialize",
 			reqMethod: `initialize`,
-			resp:      `{"foo":"bar"}`,
-			params:    `{"hello":"world"}`,
+			resp:      `{"capabilities":{"textDocumentSyncKind":1},"serverInfo":{"name":"test-ls","version":"0.0.1"}}`,
+			params: InitializeParams{
+				ProcessId: 1,
+				ClientInfo: ClientInfo{
+					Name:    "test",
+					Version: "0.0.1",
+				},
+			},
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

@@ -30,7 +30,6 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 	// Implement handling of different LSP requests here
 	log.Println("Received request:", req.Method)
 	log.Println("Received ID:", req.ID)
-	log.Println("Received params:", req.Params)
 
 	resp, err := h.process(req)
 	if err != nil {

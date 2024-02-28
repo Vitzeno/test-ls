@@ -54,6 +54,7 @@ func stdHandler(ctx context.Context, handler *internal.Handler) error {
 		handler,
 	).DisconnectNotify()
 
+	fmt.Println("")
 	log.Println("Connection closed")
 	return nil
 }

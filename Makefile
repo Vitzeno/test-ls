@@ -10,7 +10,7 @@ build:
 
 # make sure Content-Length is of correct value for given request
 init: build
-	@echo 'Content-Length: 51\r\n\r\n{"jsonrpc": "2.0", "method": "initialize", "id": 1}' | ./lspserver
+	@echo 'Content-Length: 118\r\n\r\n{"jsonrpc":"2.0","method":"initialize","id":1,"params":{"processId":1,"clientInfo":{"name":"test","version":"0.0.1"}}}' | ./lspserver
 	@ rm -f lspserver
 .PHONY: init
 
