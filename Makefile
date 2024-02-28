@@ -24,9 +24,9 @@ test:
 .PHONY: test
 
 path: build
-	@mv test-ls /usr/local/bin
-.PHONY: path
+	@ln -s -f $$(pwd)/test-ls /usr/local/bin/test-ls
+.PHONY: link-path
 
-rm-path:
-	@rm -f /usr/local/bin/test-ls
-.PHONY: rm-path 
+rm-link:
+	@unlink /usr/local/bin/test-ls
+.PHONY: rm-link 
