@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/sourcegraph/jsonrpc2"
 )
@@ -28,8 +29,7 @@ func New() *Handler {
 }
 
 func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
-	//log.Println("Received request:", req.Method)
-	//log.Println("Received ID:", req.ID)
+	log.Printf("Received request: %s with ID: %v \n", req.Method, req.ID)
 
 	resp, err := h.process(ctx, req, conn)
 	if err != nil {

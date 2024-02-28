@@ -1,5 +1,5 @@
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = 'test',
+vim.api.nvim_create_autocmd('FileType', {
+    -- pattern = 'test',
     callback = function()
         vim.lsp.start({
             name = "test-ls",

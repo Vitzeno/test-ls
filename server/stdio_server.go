@@ -20,8 +20,6 @@ func NewStdioServer(handler *handlers.Handler) *StdioServer {
 }
 
 func (s *StdioServer) Serve(ctx context.Context) error {
-	//log.Println("Waiting for connection")
-
 	<-jsonrpc2.NewConn(
 		ctx,
 		jsonrpc2.NewBufferedStream(types.Stdrwc{}, jsonrpc2.VSCodeObjectCodec{}),
@@ -29,7 +27,5 @@ func (s *StdioServer) Serve(ctx context.Context) error {
 		s.handler,
 	).DisconnectNotify()
 
-	//fmt.Println("")
-	//log.Println("Connection closed")
 	return nil
 }

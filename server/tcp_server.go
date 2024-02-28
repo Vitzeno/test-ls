@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 
 	"github.com/Vitzeno/test-ls/handlers"
@@ -28,7 +29,7 @@ func (t *TcpServer) Serve(ctx context.Context) error {
 	}
 	defer listener.Close()
 
-	//log.Println("Server listening on localhost:8080")
+	log.Println("Server listening on localhost:8080")
 
 	// Accept incoming connections and handle them
 	for {
@@ -48,7 +49,7 @@ func (t *TcpServer) Serve(ctx context.Context) error {
 				t.handler,
 			).DisconnectNotify()
 
-			//log.Println("Connection closed")
+			log.Println("Connection closed")
 		}(conn)
 	}
 }

@@ -29,4 +29,5 @@ path: build
 
 rm-link:
 	@unlink /usr/local/bin/test-ls
+	@rm -f test-ls
 .PHONY: rm-link 

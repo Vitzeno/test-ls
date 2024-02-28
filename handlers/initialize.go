@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/Vitzeno/test-ls/types"
 	"github.com/sourcegraph/jsonrpc2"
@@ -27,6 +28,8 @@ func Initialize(ctx context.Context, params json.RawMessage) (json.RawMessage, e
 		},
 	}
 
+	log.Printf("initialize result: %v", InitializeResult)
+
 	resp, err := json.Marshal(InitializeResult)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling initialize result: %w", err)
@@ -42,6 +45,8 @@ func Initialized(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Con
 		Type:    Info,
 		Message: "test-ls initialized",
 	}
+
+	log.Printf("initialized: %v", ShowMessageParams)
 
 	return conn.Notify(ctx, "window/showMessage", ShowMessageParams)
 }
