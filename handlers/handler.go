@@ -1,4 +1,4 @@
-package internal
+package handlers
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type Handler struct {
 	MethodHandlers       map[string]MethodHandler
 }
 
-func NewHandler() *Handler {
+func New() *Handler {
 	return &Handler{
 		NotificationHandlers: map[string]NotificationHandler{},
 		MethodHandlers: map[string]MethodHandler{

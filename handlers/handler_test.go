@@ -1,4 +1,4 @@
-package internal
+package handlers
 
 import (
 	"context"
@@ -33,7 +33,7 @@ func TestHandler(t *testing.T) {
 			ctx := context.Background()
 			serverConn, clientConn := net.Pipe()
 
-			handler := NewHandler()
+			handler := New()
 
 			server := jsonrpc2.NewConn(ctx, jsonrpc2.NewPlainObjectStream(serverConn), handler)
 			defer server.Close()
