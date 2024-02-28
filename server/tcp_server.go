@@ -10,7 +10,18 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-func tcpHandler(ctx context.Context, handler *handlers.Handler) error {
+// TcpServer is a server that listens for JSON-RPC messages on a TCP socket.
+type TcpServer struct {
+	handler *handlers.Handler
+}
+
+func NewTcpServer(handler *handlers.Handler) *TcpServer {
+	return &TcpServer{
+		handler: handler,
+	}
+}
+
+func (t *TcpServer) Serve(ctx context.Context) error {
 	// Create a new TCP listener on localhost:8080
 	listener, err := net.Listen("tcp", "localhost:8080")
 	if err != nil {
@@ -35,7 +46,7 @@ func tcpHandler(ctx context.Context, handler *handlers.Handler) error {
 			<-jsonrpc2.NewConn(
 				ctx,
 				jsonrpc2.NewBufferedStream(conn, jsonrpc2.VSCodeObjectCodec{}),
-				handler,
+				t.handler,
 			).DisconnectNotify()
 
 			log.Println("Connection closed")
