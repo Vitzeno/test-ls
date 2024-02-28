@@ -8,11 +8,11 @@ type InitializeParams struct {
 		exit (see exit notification).
 	*/
 	ProcessId             int                `json:"processId"`
-	ClientInfo            ClientInfo         `json:"clientInfo,omitempty"`
 	Capabilities          ClientCapabilities `json:"capabilities,omitempty"`
-	Locale                string             `json:"locale,omitempty"`
-	InitializationOptions interface{}        `json:"initializationOptions,omitempty"`
-	Trace                 string             `json:"trace,omitempty"`
+	ClientInfo            *ClientInfo        `json:"clientInfo,omitempty"`
+	Locale                *string            `json:"locale,omitempty"`
+	InitializationOptions *interface{}       `json:"initializationOptions,omitempty"`
+	Trace                 *string            `json:"trace,omitempty"`
 	WorkspaceFolders      []WorkspaceFolder  `json:"workspaceFolders,omitempty"`
 }
 
@@ -25,17 +25,17 @@ type WorkspaceFolder struct {
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initializeResult
 type InitializeResult struct {
 	Capabilities ServerCapabilities `json:"capabilities"`
-	ServerInfo   ServerInfo         `json:"serverInfo,omitempty"`
+	ServerInfo   *ServerInfo        `json:"serverInfo,omitempty"`
 }
 
 type ClientInfo struct {
-	Name    string `json:"name,omitempty"`
-	Version string `json:"version,omitempty"`
+	Name    string  `json:"name"`
+	Version *string `json:"version,omitempty"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#clientCapabilities
 type ClientCapabilities struct {
-	TextDocument TextDocumentClientCapabilities `json:"textDocument,omitempty"`
+	TextDocument *TextDocumentClientCapabilities `json:"textDocument,omitempty"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentClientCapabilities
@@ -43,8 +43,8 @@ type TextDocumentClientCapabilities struct {
 }
 
 type ServerInfo struct {
-	Name    string `json:"name,omitempty"`
-	Version string `json:"version,omitempty"`
+	Name    string  `json:"name"`
+	Version *string `json:"version,omitempty"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#serverCapabilities
@@ -54,8 +54,8 @@ type ServerCapabilities struct {
 		Is either a detailed structure defining each notification
 		or for backwards compatibility the TextDocumentSyncKind number.
 	*/
-	TextDocumentSync TextDocumentSyncKind `json:"textDocumentSyncKind,omitempty"`
-	Hover            bool                 `json:"hoverProvider,omitempty"`
+	TextDocumentSync *TextDocumentSyncKind `json:"textDocumentSyncKind,omitempty"`
+	Hover            *bool                 `json:"hoverProvider,omitempty"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentSyncKind
@@ -66,7 +66,30 @@ const (
 	Incremental TextDocumentSyncKind = 2
 )
 
-// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#hoverClientCapabilities
-type HoverOptions struct {
-	DynamicRegistration bool `json:"dynamicRegistration,omitempty"`
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#showMessageRequestParams
+type ShowMessageRequestParams struct {
+	Type    MessageType          `json:"type"`
+	Message string               `json:"message"`
+	Actions []*MessageActionItem `json:"actions,omitempty"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#window_showMessage
+type ShowMessageParams struct {
+	Type    MessageType `json:"type"`
+	Message string      `json:"message"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#messageType
+type MessageType int
+
+const (
+	Error   MessageType = 1
+	Warning MessageType = 2
+	Info    MessageType = 3
+	Log     MessageType = 4
+)
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#messageActionItem
+type MessageActionItem struct {
+	Title string `json:"title"`
 }

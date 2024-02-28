@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/Vitzeno/test-ls/handlers"
@@ -29,17 +28,17 @@ func (t *TcpServer) Serve(ctx context.Context) error {
 	}
 	defer listener.Close()
 
-	log.Println("Server listening on localhost:8080")
+	//log.Println("Server listening on localhost:8080")
 
 	// Accept incoming connections and handle them
 	for {
-		log.Println("Waiting for connection")
+		//log.Println("Waiting for connection")
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Printf("failed to accept connection: %v", err)
+			//log.Printf("failed to accept connection: %v", err)
 			continue
 		}
-		log.Println("Accepted connection")
+		//log.Println("Accepted connection")
 
 		// Start a new goroutine to handle multiple connections concurrently
 		go func(conn net.Conn) {
@@ -49,8 +48,7 @@ func (t *TcpServer) Serve(ctx context.Context) error {
 				t.handler,
 			).DisconnectNotify()
 
-			log.Println("Connection closed")
-			// possible that curl cannot handle the \n\n after content-length header causing it to hang
+			//log.Println("Connection closed")
 		}(conn)
 	}
 }

@@ -2,8 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"github.com/Vitzeno/test-ls/handlers"
 	"github.com/Vitzeno/test-ls/types"
@@ -22,7 +20,7 @@ func NewStdioServer(handler *handlers.Handler) *StdioServer {
 }
 
 func (s *StdioServer) Serve(ctx context.Context) error {
-	log.Println("Waiting for connection")
+	//log.Println("Waiting for connection")
 
 	<-jsonrpc2.NewConn(
 		ctx,
@@ -31,7 +29,7 @@ func (s *StdioServer) Serve(ctx context.Context) error {
 		s.handler,
 	).DisconnectNotify()
 
-	fmt.Println("")
-	log.Println("Connection closed")
+	//fmt.Println("")
+	//log.Println("Connection closed")
 	return nil
 }

@@ -4,13 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-type NotificationHandler func(params json.RawMessage) error
-type MethodHandler func(params json.RawMessage) (json.RawMessage, error)
+type NotificationHandler func(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) error
+type MethodHandler func(ctx context.Context, params json.RawMessage) (json.RawMessage, error)
 
 type Handler struct {
 	NotificationHandlers map[string]NotificationHandler
@@ -19,7 +18,9 @@ type Handler struct {
 
 func New() *Handler {
 	return &Handler{
-		NotificationHandlers: map[string]NotificationHandler{},
+		NotificationHandlers: map[string]NotificationHandler{
+			"initialized": Initialized,
+		},
 		MethodHandlers: map[string]MethodHandler{
 			"initialize": Initialize,
 		},
@@ -27,28 +28,28 @@ func New() *Handler {
 }
 
 func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
-	// Implement handling of different LSP requests here
-	log.Println("Received request:", req.Method)
-	log.Println("Received ID:", req.ID)
+	//log.Println("Received request:", req.Method)
+	//log.Println("Received ID:", req.ID)
 
-	resp, err := h.process(req)
+	resp, err := h.process(ctx, req, conn)
 	if err != nil {
 		err := &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: "Method not found"}
 		if err := conn.ReplyWithError(ctx, req.ID, err); err != nil {
-			log.Println(err)
+			//fmt.Errorf("error responding to request: %v", err)
 			return
 		}
 	}
 
 	if resp != nil {
 		if err := conn.Reply(ctx, req.ID, resp); err != nil {
-			log.Println("Error responding to request:", err)
+			//fmt.Errorf("error responding to request: %v", err)
+			return
 		}
 		return
 	}
 }
 
-func (h *Handler) process(req *jsonrpc2.Request) (json.RawMessage, error) {
+func (h *Handler) process(ctx context.Context, req *jsonrpc2.Request, conn *jsonrpc2.Conn) (json.RawMessage, error) {
 	params := []byte(``)
 	if req.Params != nil {
 		params = *req.Params
@@ -57,14 +58,14 @@ func (h *Handler) process(req *jsonrpc2.Request) (json.RawMessage, error) {
 	// helper func that check if req has ID, if not determined as notification
 	if req.Notif {
 		if notifHandler, ok := h.NotificationHandlers[req.Method]; ok {
-			return nil, notifHandler(params)
+			return nil, notifHandler(ctx, params, conn)
 		}
 		// TODO: use error code from lsp spec, or is the jsonrpc2.CodeMethodNotFound wrapper enough?
 		return nil, fmt.Errorf("no notification handler for method %q", req.Method)
 	}
 
 	if methodHandler, ok := h.MethodHandlers[req.Method]; ok {
-		return methodHandler(params)
+		return methodHandler(ctx, params)
 	}
 
 	// TODO: use error code from lsp spec, or is the jsonrpc2.CodeMethodNotFound wrapper enough?

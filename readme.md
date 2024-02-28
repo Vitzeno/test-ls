@@ -1,9 +1,5 @@
 # test-ls
 
--   Editor Setup
-    -   Neovim
-    -   VSCode
-
 ## JSON RPC Responses
 
 The JSON RPC spec consists of a header and a content section. The sectinos are separated by a `\r\n`. Each header field is also terminated by `\r\n` and at least one header is required. Supported headers include:
@@ -42,11 +38,28 @@ curl --http0.9 --location-trusted 'localhost:8080' --header "Content-Type: appli
 
 ## Editor Setup
 
-TODO
+Neovim setup is the easist and is therefore used for most of the testing.
 
 ### Neovim setup
 
-TODO
+Simply add the following snippet to a new `init.lua` config file (not the main one stored in `.config/nvim/`). This will start the lsp (as long as the binary is present in `$PATH`) for files with the `test` extension (I really need to find a better name).
+
+```lua
+vim.api.nvim_create_autocmd("FileType",
+    pattern = 'test',
+    callback = function()
+        vim.lsp.start({
+            name = "test-ls",
+            cmd = { "test-ls" },
+            root_dir = vim.loop.cwd(),
+        })
+    end,
+)
+```
+
+```basgh
+nvim --clean -u init.lua main.test
+```
 
 ### VSCode
 

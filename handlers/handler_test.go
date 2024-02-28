@@ -5,6 +5,7 @@ import (
 	"net"
 	"testing"
 
+	"github.com/Vitzeno/test-ls/types"
 	"github.com/sourcegraph/jsonrpc2"
 	"github.com/stretchr/testify/require"
 )
@@ -22,9 +23,9 @@ func TestHandler(t *testing.T) {
 			resp:      `{"capabilities":{"textDocumentSyncKind":1},"serverInfo":{"name":"test-ls","version":"0.0.1"}}`,
 			params: InitializeParams{
 				ProcessId: 1,
-				ClientInfo: ClientInfo{
+				ClientInfo: &ClientInfo{
 					Name:    "test",
-					Version: "0.0.1",
+					Version: types.P("0.0.1"),
 				},
 			},
 		},
