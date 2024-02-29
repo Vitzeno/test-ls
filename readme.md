@@ -42,24 +42,25 @@ Neovim setup is the easist and is therefore used for most of the testing.
 
 ### Neovim setup
 
-Simply add the following snippet to a new `init.lua` config file (not the main one stored in `.config/nvim/`). This will start the lsp (as long as the binary is present in `$PATH`) for files with the `test` extension (I really need to find a better name).
+Simply add the following snippet to a new `init.lua` config file (not the main one stored in `.config/nvim/`). This will start the lsp (as long as the binary is present in `$PATH`).
 
 ```lua
-vim.api.nvim_create_autocmd("FileType",
-    pattern = 'test',
-    callback = function()
-        vim.lsp.start({
-            name = "test-ls",
-            cmd = { "test-ls" },
-            root_dir = vim.loop.cwd(),
-        })
-    end,
-)
+vim.lsp.start({
+    name = 'test-ls',
+    cmd = {'test-ls'},
+    root_dir = vim.fs.dirname(vim.fs.find({'.test-ls'}, { upward = true })[1]),
+})
 ```
 
-```basgh
+Note this starts the LSP on neovim startup rather than on a per file type basis.
+
+Now run neovim in clean mode to avoid conflicts with any other plugins and use the new `init.lua` config file.
+
+```bash
 nvim --clean -u init.lua main.test
 ```
+
+For additional info on LSP setup with neovim consult this [guide](https://neovim.io/doc/user/lsp.html).
 
 ### VSCode
 
