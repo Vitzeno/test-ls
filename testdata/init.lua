@@ -15,11 +15,12 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufReadPost", "BufNewFile" }, {
     end
 })
 
+-- Create an autocmd to trigger hover on cursor hold
 vim.api.nvim_create_autocmd("CursorHold", {
     pattern = "*",
     callback = function()
       -- Let's add a small delay to avoid excessive requests
-      vim.cmd("sleep 300m") -- Delay of 300 milliseconds
+      vim.cmd("sleep 100m") -- Delay of 100 milliseconds
       vim.lsp.buf.hover()
     end
 })
@@ -31,6 +32,23 @@ function on_attach(client)
     client.server_capabilities.hoverProvider = true -- Assuming your server advertises this 
     client.resolved_capabilities.hoverProvider = true
 
+    vim.lsp.handlers["textDocument/publishDiagnostics"] = function(_, _, result)
+        local diagnostics = vim.lsp.util.convert_diagnostics(result)
+    
+        vim.api.nvim_buf_clear_namespace(0, vim.lsp.diagnostic.get_namespace_id(), 0, -1)
+    
+        for _, diag in ipairs(diagnostics) do
+            local opts = { virtual = true }
+    
+            if diag.severity == vim.lsp.protocol.DiagnosticSeverity.Error then
+              opts.virt_text =  { {"   ", "Error"}}
+            elseif diag.severity == vim.lsp.protocol.DiagnosticSeverity.Warning then
+              opts.virt_text =  { {"   ", "Warning"}}
+            end  
+    
+            vim.api.nvim_buf_set_virtual_text(0, vim.lsp.diagnostic.get_namespace_id(), diag.range.start.line, { {diag.message}, opts})
+        end
+    end
 
     vim.lsp.handlers["textDocument/hover"] = function(_, _, result)
         if result == nil or vim.tbl_isempty(result) then return end 

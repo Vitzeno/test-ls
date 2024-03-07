@@ -68,7 +68,7 @@ type PublishDiagnosticsParams struct {
 type Diagnostic struct {
 	Range              Range                          `json:"range"`
 	Message            string                         `json:"message"`
-	Severity           *int                           `json:"severity,omitempty"`
+	Severity           *DiagnosticSeverity            `json:"severity,omitempty"`
 	Code               *int                           `json:"code,omitempty"`
 	Source             *string                        `json:"source,omitempty"`
 	Tags               []int                          `json:"tags,omitempty"`
@@ -86,3 +86,12 @@ type Location struct {
 	URI   string `json:"uri"`
 	Range Range  `json:"range"`
 }
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnosticSeverity
+type DiagnosticSeverity int // 1: Error, 2: Warning, 3: Information, 4: Hint
+const (
+	DiagError       DiagnosticSeverity = 1
+	DiagWarning     DiagnosticSeverity = 2
+	DiagInformation DiagnosticSeverity = 3
+	DiagHint        DiagnosticSeverity = 4
+)

@@ -54,5 +54,5 @@ func DidSave(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) e
 
 	log.Printf("didSave params: %+v", p)
 
-	return nil
+	return Diagnostics(ctx, params, conn)
 }

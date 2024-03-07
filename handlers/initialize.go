@@ -46,12 +46,12 @@ func Initialize(ctx context.Context, params json.RawMessage) (json.RawMessage, e
 func Initialized(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) error {
 	// no need to bother with unmarshalling, params will be empty
 	// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialized
-	ShowMessageParams := ShowMessageParams{
+	showMessageParams := ShowMessageParams{
 		Type:    Info,
 		Message: "test-ls initialized",
 	}
 
-	log.Printf("initialized response: %+v", ShowMessageParams)
+	log.Printf("initialized response: %+v", showMessageParams)
 
-	return conn.Notify(ctx, "window/showMessage", ShowMessageParams)
+	return conn.Notify(ctx, "window/showMessage", showMessageParams)
 }
