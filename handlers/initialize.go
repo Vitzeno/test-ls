@@ -17,10 +17,12 @@ func Initialize(ctx context.Context, params json.RawMessage) (json.RawMessage, e
 		return nil, fmt.Errorf("error unmarshalling initialize params: %w", err)
 	}
 
-	InitializeResult := InitializeResult{
+	log.Printf("initialize params: %+v", p)
+
+	InitializeResult := InitializeResponse{
 		Capabilities: ServerCapabilities{
-			TextDocumentSync: types.P(Full),
-			Hover:            types.P(false),
+			TextDocumentSync: types.P(Incremental),
+			Hover:            types.P(true),
 		},
 		ServerInfo: &ServerInfo{
 			Name:    "test-ls",
@@ -28,12 +30,12 @@ func Initialize(ctx context.Context, params json.RawMessage) (json.RawMessage, e
 		},
 	}
 
-	log.Printf("initialize result: %v", InitializeResult)
-
 	resp, err := json.Marshal(InitializeResult)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling initialize result: %w", err)
 	}
+
+	log.Printf("initialize response: %+v", string(resp))
 
 	return resp, nil
 }
@@ -46,7 +48,7 @@ func Initialized(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Con
 		Message: "test-ls initialized",
 	}
 
-	log.Printf("initialized: %v", ShowMessageParams)
+	log.Printf("initialized response: %+v", ShowMessageParams)
 
 	return conn.Notify(ctx, "window/showMessage", ShowMessageParams)
 }

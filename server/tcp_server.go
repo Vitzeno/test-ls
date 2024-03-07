@@ -10,18 +10,18 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-// TcpServer is a server that listens for JSON-RPC messages on a TCP socket.
-type TcpServer struct {
+// Tcp is a server that listens for JSON-RPC messages on a TCP socket.
+type Tcp struct {
 	handler *handlers.Handler
 }
 
-func NewTcpServer(handler *handlers.Handler) *TcpServer {
-	return &TcpServer{
+func NewTcp(handler *handlers.Handler) *Tcp {
+	return &Tcp{
 		handler: handler,
 	}
 }
 
-func (t *TcpServer) Serve(ctx context.Context) error {
+func (t *Tcp) Serve(ctx context.Context) error {
 	// Create a new TCP listener on localhost:8080
 	listener, err := net.Listen("tcp", "localhost:8080")
 	if err != nil {

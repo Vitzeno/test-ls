@@ -8,18 +8,18 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-// StdioServer is a server that listens for JSON-RPC messages on stdin and stdout.
-type StdioServer struct {
+// Stdio is a server that listens for JSON-RPC messages on stdin and stdout.
+type Stdio struct {
 	handler *handlers.Handler
 }
 
-func NewStdioServer(handler *handlers.Handler) *StdioServer {
-	return &StdioServer{
+func NewStdio(handler *handlers.Handler) *Stdio {
+	return &Stdio{
 		handler: handler,
 	}
 }
 
-func (s *StdioServer) Serve(ctx context.Context) error {
+func (s *Stdio) Serve(ctx context.Context) error {
 	<-jsonrpc2.NewConn(
 		ctx,
 		jsonrpc2.NewBufferedStream(types.Stdrwc{}, jsonrpc2.VSCodeObjectCodec{}),

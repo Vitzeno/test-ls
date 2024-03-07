@@ -23,7 +23,7 @@ type WorkspaceFolder struct {
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initializeResult
-type InitializeResult struct {
+type InitializeResponse struct {
 	Capabilities ServerCapabilities `json:"capabilities"`
 	ServerInfo   *ServerInfo        `json:"serverInfo,omitempty"`
 }
