@@ -56,6 +56,14 @@ type ServerCapabilities struct {
 	*/
 	TextDocumentSync *TextDocumentSyncKind `json:"textDocumentSyncKind,omitempty"`
 	Hover            *bool                 `json:"hoverProvider,omitempty"`
+	Diagnostics      *DiagnosticsOptions   `json:"diagnostics,omitempty"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnosticOptions
+type DiagnosticsOptions struct {
+	Identifier            *string `json:"identifier,omitempty"`
+	InterFileDependencies *bool   `json:"interFileDependencies,omitempty"`
+	WorkspaceDiagnostics  *bool   `json:"workspaceDiagnostics,omitempty"`
 }
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentSyncKind

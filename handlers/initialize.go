@@ -23,6 +23,9 @@ func Initialize(ctx context.Context, params json.RawMessage) (json.RawMessage, e
 		Capabilities: ServerCapabilities{
 			TextDocumentSync: types.P(Incremental),
 			Hover:            types.P(true),
+			Diagnostics: &DiagnosticsOptions{
+				Identifier: types.P("test-ls"),
+			},
 		},
 		ServerInfo: &ServerInfo{
 			Name:    "test-ls",

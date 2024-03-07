@@ -14,16 +14,24 @@ func Hover(ctx context.Context, params json.RawMessage) (json.RawMessage, error)
 		return nil, fmt.Errorf("error unmarshalling hover params: %w", err)
 	}
 
-	log.Printf("raw hover params: %+v", string(params))
 	log.Printf("hover params: %+v", p)
 
 	HoverResponse := HoverResponse{
 		Contents: MarkupContent{
 			Kind: MarkupKind{
-				Markdown:  "markdown",
 				PlainText: "plaintext",
 			},
 			Value: "Hello, world!",
+		},
+		Range: &Range{
+			Start: Position{
+				Line:      0,
+				Character: 0,
+			},
+			End: Position{
+				Line:      0,
+				Character: 12,
+			},
 		},
 	}
 

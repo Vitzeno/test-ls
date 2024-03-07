@@ -1,7 +1,7 @@
 package handlers
 
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#hoverParams
-type HoverParams []TextDocumentPositionParams
+type HoverParams TextDocumentPositionParams
 
 // WorkDoneProgressParams
 
@@ -55,4 +55,34 @@ type MarkupContent struct {
 type MarkupKind struct {
 	PlainText string `json:"plaintext"`
 	Markdown  string `json:"markdown"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#publishDiagnosticsParams
+type PublishDiagnosticsParams struct {
+	URI         string       `json:"uri"`
+	Diagnostics []Diagnostic `json:"diagnostics"`
+	Version     *int         `json:"version,omitempty"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnostic
+type Diagnostic struct {
+	Range              Range                          `json:"range"`
+	Message            string                         `json:"message"`
+	Severity           *int                           `json:"severity,omitempty"`
+	Code               *int                           `json:"code,omitempty"`
+	Source             *string                        `json:"source,omitempty"`
+	Tags               []int                          `json:"tags,omitempty"`
+	RelatedInformation []DiagnosticRelatedInformation `json:"relatedInformation,omitempty"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnosticRelatedInformation
+type DiagnosticRelatedInformation struct {
+	Location Location `json:"location"`
+	Message  string   `json:"message"`
+}
+
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#location
+type Location struct {
+	URI   string `json:"uri"`
+	Range Range  `json:"range"`
 }
