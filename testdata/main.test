@@ -8,8 +8,6 @@ if (a + b  < 12) {
 }
 
 let c = 0;
-let c = 0;
-c = d;
 
 while (c < 10) {
     c = a + b;

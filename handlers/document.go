@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Vitzeno/test-ls/llm"
 	"github.com/sourcegraph/jsonrpc2"
 )
 
@@ -71,5 +72,33 @@ func DidSave(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) e
 
 	log.Printf("textDocument/publishDiagnostics: %+v", diag)
 
+	// no need to wait for the response or handle errors of the llm suggestion
+	go LlmSuggestion(ctx, conn, diagnostics)
+
 	return conn.Notify(ctx, "textDocument/publishDiagnostics", diag)
+}
+
+func LlmSuggestion(ctx context.Context, conn *jsonrpc2.Conn, diagnostics []Diagnostic) error {
+	for _, diag := range diagnostics {
+		resp, err := llm.Prompt(diag.Message, "")
+		if err != nil {
+			log.Printf("error getting llm response: %v", err)
+			return fmt.Errorf("error getting llm response: %w", err)
+		}
+
+		showMessageParams := ShowMessageParams{
+			Type:    Info,
+			Message: resp,
+		}
+
+		log.Printf("llm response: %+v", showMessageParams)
+
+		err = conn.Notify(ctx, "window/showMessage", showMessageParams)
+		if err != nil {
+			log.Printf("error sending llm response: %v", err)
+			return fmt.Errorf("error sending llm response: %w", err)
+		}
+	}
+
+	return nil
 }
