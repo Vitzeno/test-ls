@@ -12,21 +12,62 @@ import (
 )
 
 const (
-	preText = `
+	prePrompt = `
 	You are a large language model designed to debug code. 
 	You are given a code snippet and an error. 
 	Your task is to provide a one sentense response to the error. 
+	
 	The error is: %s
 	The code snippet is: %s
 
-	What is a potentail solution?
+	What is a potential solution?
 	`
 )
 
-func Prompt(errorText, codeText string) (string, error) {
+type Ollama struct {
+	Endpoint  string `json:"endpoint"`
+	Model     string `json:"model"`
+	PrePrompt string `json:"pre_prompt"`
+}
+
+func New(opts ...OllamaOption) *Ollama {
+	o := Ollama{
+		Endpoint:  "http://localhost:11434/api/generate",
+		Model:     "mistral",
+		PrePrompt: prePrompt,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	return &o
+}
+
+type OllamaOption func(o *Ollama)
+
+func WithEndpoint(endpoint string) OllamaOption {
+	return func(o *Ollama) {
+		o.Endpoint = endpoint
+	}
+}
+
+func WithModel(model string) OllamaOption {
+	return func(o *Ollama) {
+		o.Model = model
+	}
+}
+
+func WithPrePrompt(prePrompt string) OllamaOption {
+	return func(o *Ollama) {
+		o.PrePrompt = prePrompt
+	}
+}
+
+func (o *Ollama) Prompt(errorText, codeText string) (string, error) {
 	req := Request{
-		Model:  "mistral",
-		Prompt: fmt.Sprintf(preText, errorText, codeText),
+		Model:  o.Model,
+		Prompt: fmt.Sprintf(o.PrePrompt, errorText, codeText),
 		Stream: types.P(false),
 	}
 
@@ -36,7 +77,7 @@ func Prompt(errorText, codeText string) (string, error) {
 	}
 
 	resp, err := http.Post(
-		"http://localhost:11434/api/generate",
+		o.Endpoint,
 		"application/json",
 		bytes.NewReader(j),
 	)

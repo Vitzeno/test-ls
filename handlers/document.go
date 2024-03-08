@@ -79,8 +79,9 @@ func DidSave(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) e
 }
 
 func LlmSuggestion(ctx context.Context, conn *jsonrpc2.Conn, diagnostics []Diagnostic) error {
+	ollama := llm.New()
 	for _, diag := range diagnostics {
-		resp, err := llm.Prompt(diag.Message, "")
+		resp, err := ollama.Prompt(diag.Message, "")
 		if err != nil {
 			log.Printf("error getting llm response: %v", err)
 			return fmt.Errorf("error getting llm response: %w", err)
