@@ -18,7 +18,7 @@ func Diagnostics(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Con
 	diag := PublishDiagnosticsParams{
 		URI: "file:///path/to/file",
 		Diagnostics: []Diagnostic{
-			Diagnostic{
+			{
 				Range: Range{
 					Start: Position{
 						Line:      0,

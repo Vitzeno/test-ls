@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Vitzeno/test-ls/types"
 	"github.com/sourcegraph/jsonrpc2"
 )
 
@@ -54,5 +55,43 @@ func DidSave(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) e
 
 	log.Printf("didSave params: %+v", p)
 
-	return Diagnostics(ctx, params, conn)
+	// we gather diagnostics on save and send them to the client
+	diag := PublishDiagnosticsParams{
+		URI: p.TextDocument.URI,
+		Diagnostics: []Diagnostic{
+			{
+				Range: Range{
+					Start: Position{
+						Line:      0,
+						Character: 0,
+					},
+					End: Position{
+						Line:      0,
+						Character: 13,
+					},
+				},
+				Severity: types.P(DiagError),
+				Message:  "Something broke :(",
+			},
+			{
+				Range: Range{
+					Start: Position{
+						Line:      2,
+						Character: 4,
+					},
+					End: Position{
+						Line:      0,
+						Character: 7,
+					},
+				},
+				Severity: types.P(DiagError),
+				Message:  "Something else broke too :(",
+			},
+		},
+		Version: types.P(1),
+	}
+
+	log.Printf("textDocument/publishDiagnostics: %+v", diag)
+
+	return conn.Notify(ctx, "textDocument/publishDiagnostics", diag)
 }

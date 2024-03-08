@@ -48,7 +48,7 @@ func Initialized(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Con
 	// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialized
 	showMessageParams := ShowMessageParams{
 		Type:    Info,
-		Message: "test-ls initialized",
+		Message: "We are go for launch!",
 	}
 
 	log.Printf("initialized response: %+v", showMessageParams)
