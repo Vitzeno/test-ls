@@ -1,6 +1,16 @@
-hello world!
+let a = 5;
+let b = 5;
 
-add some words
-add some more words
-add even more words
-add some words
+if (a + b  < 12) {
+    print(a);
+} else {
+    print(25);
+}
+
+let c = 0;
+let c = 0;
+c = d;
+
+while (c < 10) {
+    c = a + b;
+}
