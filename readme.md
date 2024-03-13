@@ -82,3 +82,51 @@ For additional info on LSP setup with neovim consult this [guide](https://neovim
 ### VSCode
 
 Setting up the sever to function in VSCode is abit more complex as it invloves creeating a client extension which would first invloke the server and then interface with VSCode.
+
+### Example messages
+
+#### Initialize Request
+
+```json
+{
+	"jsonrpc": "2.0",
+	"method": "initialize",
+	"id": 1,
+	"params": {
+		"ProcessId": 53969,
+		"ClientInfo": {
+			"Name": "neovim",
+			"Version": "0.9.5"
+		},
+		"WorkspaceFolders": [
+			{
+				"Uri": "file:///Users/mohamed/Documents/Projects/test-ls/testdata",
+				"Name": "/Users/mohamed/Documents/Projects/test-ls/testdata"
+			}
+		]
+	}
+}
+```
+
+#### Initialize Response
+
+```json
+{
+	"jsonrpc": "2.0",
+	"method": "initialize",
+	"id": 1,
+	"params": {
+		"capabilities": {
+			"textDocumentSyncKind": 2,
+			"hoverProvider": true,
+			"diagnostics": {
+				"identifier": "test-ls"
+			}
+		},
+		"serverInfo": {
+			"name": "test-ls",
+			"version": "0.0.1"
+		}
+	}
+}
+```
