@@ -2,9 +2,12 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"strings"
 
+	"github.com/Vitzeno/test-ls/llm"
 	"github.com/Vitzeno/test-ls/types"
 	"github.com/vitzeno/llvm-test/parser"
 )
@@ -46,4 +49,58 @@ func GetDiagnostics(fileURI string) ([]Diagnostic, error) {
 	}
 
 	return diagnostics, nil
+}
+
+func GetHover(fileURI string, pos Position) (HoverResponse, error) {
+	var hoverResponse HoverResponse
+
+	// Remove the "file:///" prefix
+	filePath := fileURI[7:]
+
+	// Open the file
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Println("Error opening file for hover:", err)
+		return hoverResponse, fmt.Errorf("error opening file: %w", err)
+	}
+	defer file.Close() // Ensure the file is closed
+
+	lineNumber := pos.Line + 1
+
+	fileContent, err := io.ReadAll(file)
+	if err != nil {
+		log.Println("Error reading file:", err)
+		return hoverResponse, fmt.Errorf("error reading file: %w", err)
+	}
+
+	var hoverLine string
+
+	// Split the file content into lines
+	lines := strings.Split(string(fileContent), "\n")
+
+	// Retrieve the requested line
+	if lineNumber >= 1 && lineNumber <= len(lines) {
+		hoverLine = lines[lineNumber-1]
+	} else {
+		log.Println("Line number out of range")
+		return hoverResponse, fmt.Errorf("line number out of range")
+	}
+
+	ollama := llm.New(llm.WithExplainPrompt())
+	resp, err := ollama.Prompt(hoverLine, string(fileContent))
+	if err != nil {
+		log.Printf("error getting llm response: %v", err)
+		return hoverResponse, fmt.Errorf("error getting llm response: %w", err)
+	}
+
+	hoverResponse = HoverResponse{
+		Contents: MarkupContent{
+			Kind: MarkupKind{
+				PlainText: "plaintext",
+			},
+			Value: resp,
+		},
+	}
+
+	return hoverResponse, nil
 }

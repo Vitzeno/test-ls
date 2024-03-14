@@ -51,23 +51,9 @@ func Hover(ctx context.Context, params json.RawMessage) (json.RawMessage, error)
 
 	log.Printf("hover params: %+v", p)
 
-	HoverResponse := HoverResponse{
-		Contents: MarkupContent{
-			Kind: MarkupKind{
-				PlainText: "plaintext",
-			},
-			Value: "Hello, world!",
-		},
-		Range: &Range{
-			Start: Position{
-				Line:      0,
-				Character: 0,
-			},
-			End: Position{
-				Line:      0,
-				Character: 12,
-			},
-		},
+	HoverResponse, err := GetHover(p.TextDocument.URI, p.Position)
+	if err != nil {
+		log.Printf("error getting hover: %v", err)
 	}
 
 	resp, err := json.Marshal(HoverResponse)

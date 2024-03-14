@@ -79,7 +79,7 @@ func DidSave(ctx context.Context, params json.RawMessage, conn *jsonrpc2.Conn) e
 }
 
 func LlmSuggestion(ctx context.Context, conn *jsonrpc2.Conn, diagnostics []Diagnostic) error {
-	ollama := llm.New()
+	ollama := llm.New(llm.WithDebugPrompt())
 	for _, diag := range diagnostics {
 		resp, err := ollama.Prompt(diag.Message, "")
 		if err != nil {

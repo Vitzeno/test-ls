@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	prePrompt = `
+	debugPrePrompt = `
 	You are a large language model designed to debug code. 
 	You are given a code snippet and an error. 
 	Your task is to provide a one sentense response to the error. 
@@ -21,6 +21,15 @@ const (
 	The code snippet is: %s
 
 	What is a potential solution?
+	`
+
+	explainPrePrompt = `
+	You are a large language model designed to explain code.
+	You are given a line from a file and a the entire file.
+	Your task is to provide a one sentense explanation on what the line is doing only.
+
+	The line is: %s
+	The file is: %s
 	`
 )
 
@@ -33,8 +42,8 @@ type Ollama struct {
 func New(opts ...OllamaOption) *Ollama {
 	o := Ollama{
 		Endpoint:  "http://localhost:11434/api/generate",
-		Model:     "mistral",
-		PrePrompt: prePrompt,
+		Model:     "codellama",
+		PrePrompt: debugPrePrompt,
 	}
 
 	for _, opt := range opts {
@@ -58,18 +67,27 @@ func WithModel(model string) OllamaOption {
 	}
 }
 
-func WithPrePrompt(prePrompt string) OllamaOption {
+func WithDebugPrompt() OllamaOption {
 	return func(o *Ollama) {
-		o.PrePrompt = prePrompt
+		o.PrePrompt = debugPrePrompt
 	}
 }
 
-func (o *Ollama) Prompt(errorText, codeText string) (string, error) {
+func WithExplainPrompt() OllamaOption {
+	return func(o *Ollama) {
+		o.PrePrompt = explainPrePrompt
+	}
+}
+
+func (o *Ollama) Prompt(snippet, context string) (string, error) {
+	fullPrompt := fmt.Sprintf(o.PrePrompt, snippet, context)
 	req := Request{
 		Model:  o.Model,
-		Prompt: fmt.Sprintf(o.PrePrompt, errorText, codeText),
+		Prompt: fullPrompt,
 		Stream: types.P(false),
 	}
+
+	log.Printf("prompt: %+v", fullPrompt)
 
 	j, err := json.Marshal(req)
 	if err != nil {

@@ -20,7 +20,7 @@ vim.api.nvim_create_autocmd("CursorHold", {
     pattern = "*",
     callback = function()
       -- Let's add a small delay to avoid excessive requests
-      vim.cmd("sleep 100m") -- Delay of 100 milliseconds
+      -- vim.cmd("sleep 50m") -- Delay of 50 milliseconds
       vim.lsp.buf.hover()
     end
 })
